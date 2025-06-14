@@ -254,3 +254,25 @@ initFadeCarousel('carousel3');
 
 </body>
 </html>
+<script>
+    function initFadeCarousel(container) {
+      const slides = container.querySelectorAll('.carousel-slide');
+      let index = 0;
+    
+      function showSlide(i) {
+        slides.forEach((slide, idx) => {
+          slide.classList.remove('active');
+          if (idx === i) slide.classList.add('active');
+        });
+      }
+    
+      setInterval(() => {
+        index = (index + 1) % slides.length;
+        showSlide(index);
+      }, 4000);
+    }
+    
+    document.querySelectorAll('.carousel-container').forEach(container => {
+      initFadeCarousel(container);
+    });
+    </script>
