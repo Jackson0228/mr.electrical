@@ -151,6 +151,46 @@
       padding: 25px 10px;
       font-size: 14px;
     }
+    .carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 50%;
+}
+.carousel-btn.prev {
+  left: 10px;
+}
+.carousel-btn.next {
+  right: 10px;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+.carousel-dots button {
+  width: 10px;
+  height: 10px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0.6);
+  cursor: pointer;
+}
+.carousel-dots button.active {
+  background-color: #ffcc00;
+}
   </style>
 </head>
 <body>
@@ -177,11 +217,14 @@
   <div class="services">
     <div class="card">
       <div class="carousel-container" id="carousel1">
-        <div class="carousel-track">
-          <div class="carousel-slide active"><img src="photo/Photos/IMG-20250425-WA0028.jpg" alt=""></div>
-          <div class="carousel-slide"><img src="photo/Photos/481019191_973159911585870_3580168242846399921_n.jpg" alt=""></div>
-        </div>
-      </div>
+  <div class="carousel-track">
+    <div class="carousel-slide active"><img src="photo/Photos/IMG-20250425-WA0028.jpg" alt=""></div>
+    <div class="carousel-slide"><img src="photo/Photos/481019191_973159911585870_3580168242846399921_n.jpg" alt=""></div>
+  </div>
+  <button class="carousel-btn prev">&#10094;</button>
+  <button class="carousel-btn next">&#10095;</button>
+  <div class="carousel-dots"></div>
+</div>
       <h3>住宅电路维修 / Home Electrical Repair</h3>
       <p>解决跳电、插座损坏、照明问题等各种家庭电力故障。<br>Fixing power trips, broken sockets, and lighting issues.</p>
     </div>
@@ -255,24 +298,71 @@ initFadeCarousel('carousel3');
 </body>
 </html>
 <script>
-    function initFadeCarousel(container) {
-      const slides = container.querySelectorAll('.carousel-slide');
-      let index = 0;
-    
-      function showSlide(i) {
-        slides.forEach((slide, idx) => {
-          slide.classList.remove('active');
-          if (idx === i) slide.classList.add('active');
-        });
-      }
-    
-      setInterval(() => {
-        index = (index + 1) % slides.length;
-        showSlide(index);
-      }, 4000);
-    }
-    
-    document.querySelectorAll('.carousel-container').forEach(container => {
-      initFadeCarousel(container);
+function setupCarousel(carouselId) {
+  const container = document.getElementById(carouselId);
+  const slides = container.querySelectorAll('.carousel-slide');
+  const prevBtn = container.querySelector('.prev');
+  const nextBtn = container.querySelector('.next');
+  const dotContainer = container.querySelector('.carousel-dots');
+
+  let index = 0;
+  let interval;
+
+  // Create dots
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.addEventListener('click', () => {
+      index = i;
+      updateSlides();
+      resetAutoplay();
     });
-    </script>
+    dotContainer.appendChild(dot);
+  });
+
+  const dots = dotContainer.querySelectorAll('button');
+
+  function updateSlides() {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === index);
+      dots[i].classList.toggle('active', i === index);
+    });
+  }
+
+  function nextSlide() {
+    index = (index + 1) % slides.length;
+    updateSlides();
+  }
+
+  function prevSlide() {
+    index = (index - 1 + slides.length) % slides.length;
+    updateSlides();
+  }
+
+  nextBtn.addEventListener('click', () => {
+    nextSlide();
+    resetAutoplay();
+  });
+  prevBtn.addEventListener('click', () => {
+    prevSlide();
+    resetAutoplay();
+  });
+
+  function startAutoplay() {
+    interval = setInterval(nextSlide, 4000);
+  }
+
+  function resetAutoplay() {
+    clearInterval(interval);
+    startAutoplay();
+  }
+
+  updateSlides();
+  startAutoplay();
+}
+
+// Initialize all carousels
+setupCarousel('carousel1');
+setupCarousel('carousel2');
+setupCarousel('carousel3');
+</script>
+
